@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
+[ApiController]
+[Route("[controller]")]
 public class UsersController : BaseApiController
 {
     private readonly ILogger<SwiftMessagesController> _logger;
@@ -13,7 +15,7 @@ public class UsersController : BaseApiController
         _logger = logger;
     }
 
-    [HttpGet()]
+    [HttpGet("GetAll")]
     public async Task<IActionResult> GetAllAsync()
     {
 
@@ -26,7 +28,7 @@ public class UsersController : BaseApiController
         return HandleResult(await Mediator.Send(new GetById.Query() { Id = id }));
     }
 
-    [HttpPost("create")]
+    [HttpPost("Create")]
     public async Task<IActionResult> CreateAsync(UserDto userDto)
     {
         return HandleResult(await Mediator.Send(new Create.Command 
