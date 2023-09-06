@@ -3,8 +3,6 @@ using Application.SwiftMessages;
 
 namespace API.Controllers;
 
-[ApiController]
-[Route("[controller]")]
 public class SwiftMessagesController : BaseApiController
 {
     private readonly ILogger<SwiftMessagesController> _logger;

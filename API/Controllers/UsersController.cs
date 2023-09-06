@@ -3,9 +3,6 @@ using Application.Users;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
-
-[ApiController]
-[Route("[controller]")]
 public class UsersController : BaseApiController
 {
     private readonly ILogger<SwiftMessagesController> _logger;
