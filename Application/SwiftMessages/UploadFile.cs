@@ -5,13 +5,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Persistence;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.SwiftMessages
 {
@@ -41,6 +35,14 @@ namespace Application.SwiftMessages
 
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
+                var validator = new CommandValidator();
+                var results = await validator.ValidateAsync(request, cancellationToken);
+
+                if (!results.IsValid)
+                {
+                    return Result<Unit>.Failure(results.Errors.Select(x => x.ErrorMessage));
+                }
+
                 var fileId = Guid.NewGuid().ToString();                
                 var parser = new MTParser();
                 var swiftMessage = new Dictionary<string, string>();

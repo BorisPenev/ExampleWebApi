@@ -27,7 +27,7 @@ public class GetById
         {
             using (IDbConnection db = this.sqliteDbConnectionFactory.CreateConnection())
             {
-                var query = "SELECT * FROM Users WHERE Id = @id";
+                var query = "SELECT * FROM Users WHERE Id = @Id";
                 var foundUser = await db.QuerySingleOrDefaultAsync<User>(query, new { Id = request.Id });
 
                 if (foundUser == null)

@@ -37,7 +37,7 @@ public class Delete
 
                 using (IDbTransaction transaction = db.BeginTransaction())
                 {
-                    var query = @"DELETE FROM Users WHERE Id = @id";
+                    var query = @"DELETE FROM Users WHERE Id = @Id";
                     rowsAffected = await db.ExecuteAsync(query, new { Id = request.Id }, transaction, 30, CommandType.Text);
 
                     transaction.Commit();

@@ -5,6 +5,7 @@ using MediatR;
 using Persistence;
 using System.Data;
 using BCrypt.Net;
+using System.ComponentModel.DataAnnotations;
 
 namespace Application.Users;
 
@@ -29,7 +30,7 @@ public class Create
             RuleFor(x => x.LastName).NotEmpty();
             RuleFor(x => x.Email).NotEmpty().EmailAddress();
             RuleFor(x => x.Password).NotEmpty().MinimumLength(6);
-            RuleFor(x => x.ConfirmPassword).NotEmpty().Equal(y => y.Password);
+            RuleFor(x => x.ConfirmPassword).NotEmpty().Equal(y => y.Password).WithMessage("'Confirm Password' must be equal to value of 'Password' field.");
         }
     }
 
@@ -44,6 +45,14 @@ public class Create
 
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
+            var validator = new CommandValidator();
+            var results = await validator.ValidateAsync(request, cancellationToken);
+
+            if (!results.IsValid)
+            {
+                return Result<Unit>.Failure(results.Errors.Select(x => x.ErrorMessage));
+            }
+
             var rowsAffected = 0;
             using (IDbConnection db = this.sqliteDbConnectionFactory.CreateConnection())
             {

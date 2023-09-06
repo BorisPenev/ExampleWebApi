@@ -46,6 +46,14 @@ public class Update
 
         public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
+            var validator = new CommandValidator();
+            var results = await validator.ValidateAsync(request, cancellationToken);
+
+            if (!results.IsValid)
+            {
+                return Result<Unit>.Failure(results.Errors.Select(x => x.ErrorMessage));
+            }
+
             var rowsAffected = 0;
             using (IDbConnection db = this.sqliteDbConnectionFactory.CreateConnection())
             {
@@ -53,7 +61,7 @@ public class Update
 
                 using (IDbTransaction transaction = db.BeginTransaction())
                 {
-                    var searchQuery = "SELECT * FROM Users WHERE Id = @id";
+                    var searchQuery = "SELECT * FROM Users WHERE Id = @Id";
                     var user = await db.QuerySingleOrDefaultAsync<User>(searchQuery, new { Id = request.Id });
 
                     if (user == null)
@@ -62,7 +70,7 @@ public class Update
                     }
 
                     var emailChanged = !string.IsNullOrEmpty(request.Email) && user.Email != request.Email;
-                    var searchByEmail = "SELECT * FROM Users WHERE Email = @email";
+                    var searchByEmail = "SELECT * FROM Users WHERE Email = @Email";
                     var duplicateUser = emailChanged && (await db.QuerySingleOrDefaultAsync<User>(searchByEmail, new { Email = request.Email }) != null);
                     if (emailChanged && duplicateUser)
                     {
@@ -85,7 +93,6 @@ public class Update
                         FirstName = @FirstName,
                         LastName = @LastName, 
                         Email = @Email, 
-                        Role = @Role, 
                         PasswordHash = @PasswordHash
                     WHERE Id = @Id";
                     rowsAffected = await db.ExecuteAsync(query, user, transaction, 30, CommandType.Text);
