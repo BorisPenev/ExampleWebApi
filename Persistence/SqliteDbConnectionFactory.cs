@@ -7,16 +7,16 @@ namespace Persistence;
 
 public class SqliteDbConnectionFactory 
 {
-    protected readonly IConfiguration Configuration;
+    protected readonly string dbConnectionString;
 
-    public SqliteDbConnectionFactory(IConfiguration configuration)
+    public SqliteDbConnectionFactory(string dbConnectionString)
     {
-        Configuration = configuration;
+        this.dbConnectionString = dbConnectionString;
     }
 
     public IDbConnection CreateConnection()
     {
-        return new SqliteConnection(Configuration.GetConnectionString("WebApiDatabase"));
+        return new SqliteConnection(dbConnectionString);
     }
 
     public async Task Init()
